@@ -4,6 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 class LoginFrame extends JFrame implements ActionListener {
     public static final String ICON_PATH = "C:\\Users\\AHTISHAM\\Desktop\\My_Workspace\\java_workspace\\Project\\icons\\hospital.png";
@@ -11,6 +16,11 @@ class LoginFrame extends JFrame implements ActionListener {
     JPasswordField passField;
     JTextField usernameTextField;
     JButton submitbutton;
+
+    // Database credentials
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/java_user_database";
+    private static final String DB_USER = "root";  // root is default username for sql
+    private static final String DB_PASSWORD = "";  // by defalut there is no password
 
     LoginFrame() {
         // Set frame properties
@@ -98,11 +108,51 @@ class LoginFrame extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String username = usernameTextField.getText();
         String password = new String(passField.getPassword());
-        if (e.getSource() == submitbutton && username.equals("admin") && password.equals("admin123")) {
-            new Welcome();   // welcome frame opens
-            this.dispose();
-        } else{
-            JOptionPane.showMessageDialog(null,"INCORRENT USERNAME OR PASSWORD","ERROR",JOptionPane.WARNING_MESSAGE);
+        authenticate(username, password);
+    }
+
+    private void authenticate(String username, String password) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            // Establish connection to the database
+            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+
+            // Prepare SQL query
+            String sql = "SELECT * FROM user_key WHERE username = ? AND password = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+
+            // Execute query
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+
+
+                // User found, credentials are correct so new frame is created i.e welcome frame
+                new Welcome();
+                this.dispose();
+
+
+            }
+            else {
+                // User not found, credentials are incorrect
+                JOptionPane.showMessageDialog(null, "INCORRECT USERNAME OR PASSWORD", "ERROR", JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Database error", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -127,3 +177,4 @@ class BackgroundPanel extends JPanel {
         }
     }
 }
+

@@ -35,15 +35,15 @@ public class RegistrationFrame extends JFrame {
         // Initializing components
 
         //fields
-        ageField = new JTextField("Patient's age", 20);
-        nameField = new JTextField("Patient's First name", 20);
-        lastNameField = new JTextField("Last name", 20);
+        ageField = new JTextField(" ", 20);
+        nameField = new JTextField(" ", 20);
+        lastNameField = new JTextField(" ", 20);
         dateField = new JTextField(20);
 
         //labels
         ageLabel = new JLabel("Age");
         nameLabel = new JLabel("First Name");
-        lastNameLabel = new JLabel("Last Name");
+        lastNameLabel = new JLabel("Last Namw ");
         dateLabel = new JLabel("Appointment Date");
         docLabel = new JLabel("Doctor");
         bedVar = new JLabel("Bed Allocated");
@@ -119,20 +119,23 @@ public class RegistrationFrame extends JFrame {
 
     private void registrationButtonActionPerformed() {
         //variables to store patient details and will be passed to store in date ;
-        String firstname = nameField.getText();
-        String lastname=lastNameField.getText();
-        String name = firstname.concat(lastname);
-        String age = ageField.getText();
-        Boolean bed =bedAllocation.getState();
-        String doctor = docList.getSelectedValue();
+        if (nameField.equals(" ") || lastNameField.equals(" ") || ageField.equals(" ") || docList.isSelectionEmpty() ) {
+            JOptionPane.showMessageDialog(null, "Please enter all details of Patient", "Details required", JOptionPane.WARNING_MESSAGE);
+        } else {
+            String firstname =  nameField.getText();
+            String lastname = lastNameField.getText();
+            String name = firstname + " "+ lastname ;
+            String age = ageField.getText();
+            Boolean bed = bedAllocation.getState();
+            String doctor = docList.getSelectedValue();
 //when patient details are submitted A message box will pop up Showing details of Patient;
-String message = "Patient Name: " + name +"\nAge : "+ age+"\nDoctor Reffered :"+doctor+"\nBed Allocated : "+bed;
-        // TODO: Implement registration logic here
-       // ArrayList<String> patientdetails = new ArrayList<>(List.of(new String[]{name, age}));
-        JOptionPane.showMessageDialog(null,message,"Patient Details",JOptionPane.INFORMATION_MESSAGE);
-        this.dispose();
+            String message = "Patient Name: " + name + "\nAge : " + age + "\nDoctor Reffered :" + doctor + "\nBed Allocated : " + bed;
+            // TODO: Implement registration logic here
+            // ArrayList<String> patientdetails = new ArrayList<>(List.of(new String[]{name, age}));
+            JOptionPane.showMessageDialog(null, message, "Patient Details", JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
+        }
     }
-
     public static void main(String[] args) {
         new RegistrationFrame();
     }
